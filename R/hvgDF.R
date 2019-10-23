@@ -83,7 +83,9 @@ dev.off()
 # Finding union and intersection
 HVG <- sort(table(unlist(HVG)), decreasing = TRUE)
 HVG2 <- names(HVG[(HVG/nBoot) == 1])
-write.csv(cbind(HVG/nBoot), '../Results/hvgList/DF_HVG.csv')
+outHVG <- data.frame(HVG/nBoot)
+colnames(outHVG) <- c('GENE', 'FREQUENCY')
+write.csv(outHVG, '../Results/hvgList/DF_HVG.csv')
 HVG <- names(HVG)
 
 # GO Enrichment analysis
