@@ -119,16 +119,16 @@ xplot <- as.data.frame(xplot)
 # points(regLine, type='l', col= 'red')
 
 source('https://raw.githubusercontent.com/dosorio/utilities/master/idConvert/hsa_ENTREZ2SYMBOL.R')
-topGO <- unlist(strsplit(GO$geneID[1], split = '/'))
+topGO <- unlist(strsplit(GO2$geneID[1], split = '/'))
 topGO <- hsa_ENTREZ2SYMBOL(topGO)[,2]
 
 png('../Results/figures/DF.png', width = 4000, height = 3000, res = 300)
-gCol <- ifelse(rownames(xplot) %in% HVG2, rgb(1,0,0,1), rgb(0,0,0,1))
+gCol <- ifelse(rownames(xplot) %in% HVG, rgb(1,0,0,1), rgb(0,0,0,1))
 ggplot(xplot, mapping = aes(x = mean_log, y = cv2_log)) +
 geom_point(color=gCol) +
 geom_text_repel(data = xplot[topGO,], label=topGO, max.iter = 10000, color='gray40')+
 theme_classic() +
 xlab(parse(text = 'log[10](Mean)')) +
 ylab(parse(text = 'log[10](CV^2)')) +
-ggtitle(label = 'DERMAL FIBROBLAST', subtitle = toupper(GO$Description[1]))
+ggtitle(label = 'DERMAL FIBROBLAST', subtitle = toupper(GO2$Description[1]))
 dev.off()
