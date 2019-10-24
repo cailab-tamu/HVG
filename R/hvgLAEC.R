@@ -46,7 +46,7 @@ K <- t(apply(K,1,function(X){as.numeric(rank(X, 'random') <= 1000)}))
 
 # Sampling 10 cells as center
 set.seed(1)
-nBoot <- 10
+nBoot <- 100
 sCells <- sample(seq_len(ncol(cMatrix)),nBoot, replace = TRUE)
 
 # Identify the HVG in each case
@@ -113,12 +113,16 @@ xplot <- cbind(log10(means),log10(cv2))
 colnames(xplot) <- c('mean_log','cv2_log')
 xplot <- as.data.frame(xplot)
 
+# plot(xplot)
+# regLine <- cbind(log10(pMeans),log10(pFit))
+# regLine <- regLine[order(regLine[,1]),]
+# points(regLine, type='l', col= 'red')
 
 source('https://raw.githubusercontent.com/dosorio/utilities/master/idConvert/hsa_ENTREZ2SYMBOL.R')
 topGO <- unlist(strsplit(GO2$geneID[1], split = '/'))
 topGO <- hsa_ENTREZ2SYMBOL(topGO)[,2]
 
-png('../Results/figures/DF.png', width = 4000, height = 3000, res = 300)
+png('../Results/figures/LAEC.png', width = 4000, height = 3000, res = 300)
 gCol <- ifelse(rownames(xplot) %in% HVG, rgb(1,0,0,1), rgb(0,0,0,1))
 ggplot(xplot, mapping = aes(x = mean_log, y = cv2_log)) +
   geom_point(color=gCol) +
@@ -126,5 +130,5 @@ ggplot(xplot, mapping = aes(x = mean_log, y = cv2_log)) +
   theme_classic() +
   xlab(parse(text = 'log[10](Mean)')) +
   ylab(parse(text = 'log[10](CV^2)')) +
-  ggtitle(label = 'DERMAL FIBROBLAST', subtitle = toupper(GO2$Description[1]))
+  ggtitle(label = 'LUNG AIRWAY EPITHELIUM', subtitle = toupper(GO2$Description[1]))
 dev.off()
