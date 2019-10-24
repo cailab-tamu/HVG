@@ -46,7 +46,7 @@ K <- t(apply(K,1,function(X){as.numeric(rank(X, 'random') <= 1000)}))
 
 # Sampling 10 cells as center
 set.seed(1)
-nBoot <- 10
+nBoot <- 1000
 sCells <- sample(seq_len(ncol(cMatrix)),nBoot, replace = TRUE)
 
 # Identify the HVG in each case
