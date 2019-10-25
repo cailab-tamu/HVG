@@ -9,28 +9,6 @@ GM12878 <- readMM('../Data/GM12878/matrix.mtx')
 rownames(GM12878) <- read.table('../Data/GM12878/genes.tsv', row.names = 1, stringsAsFactors = FALSE)[,1]
 colnames(GM12878) <- readLines('../Data/GM12878/barcodes.tsv')
 
-# QC Library size and mitochondrial rate
-# lSize <- colSums(GM12878)
-# #GM12878 <- GM12878[,lSize > 1000]
-# lSize <- colSums(GM12878)
-# GM12878 <- GM12878[,!lSize %in% boxplot.stats(lSize)$out]
-# mtRate <- colSums(GM12878[grepl('MT-', rownames(GM12878)),])/colSums(GM12878)
-# GM12878 <- GM12878[,mtRate < 0.1]
-
-# Cell cycle assignation
-GM12878 <- CreateSeuratObject(GM12878)
-GM12878 <- NormalizeData(GM12878)
-GM12878 <- ScaleData(GM12878)
-GM12878 <- CellCycleScoring(GM12878,s.features = cc.genes$s.genes, g2m.features = cc.genes$g2m.genes)
-#g1Cells <- GM12878$Phase %in% 'G1'
-
-# Filtering G1 Cells
-GM12878 <- GM12878@assays$RNA@counts
-GM12878 <- GM12878[,g1Cells]
-
-# Normalization
-#GM12878 <- t(t(GM12878)/colSums(GM12878))*1e6
-
 # Phate DR
 drPhate <- phate(t(GM12878), ndim = 3)
 drPhate <- drPhate$embedding
