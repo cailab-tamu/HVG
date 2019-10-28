@@ -80,36 +80,36 @@ colnames(LPF) <- readLines('../Data/FIBROBLAST2/barcodes.tsv')
 LPF <- scQC(LPF)
 hvgLPF <- findHVG(LPF)
 
+plotHVG <- function(X, mainLabel){
+  gCol <- ifelse(X$stat$p.adj < 0.01, yes = 'dodgerblue4', no = 'black')
+  gPCH <- ifelse(rownames(X$stat) %in% sharedGenes, yes = 8, no = 16)
+  plot(log(X$stat$mean),log(X$stat$cv2obs), col = gCol, pch = gPCH, main = mainLabel,
+       xlab=parse(text = 'log(Mean)'), ylab = parse(text = 'log(CV^2)'))
+  gammaReg <- X$stat[order(X$stat$mean),]
+  points(log(gammaReg$mean), log(gammaReg$cv2exp), type = 'l', col = 'orange')
+  noHVG <- sum(X$stat$p.adj > 0.01)
+  HVG <- sum(X$stat$p.adj < 0.01)
+  nShared <- length(sharedGenes)
+  legend('topright', legend = c(paste0('No HVG (',noHVG,')'), paste0('HVG FDR < 0.01 (',HVG,')'), paste0('Shared HVG (',nShared,')'), 'Gamma\nRegression'), col = c('black', 'dodgerblue4', 'dodgerblue4', 'orange'),pch = c(16,16,8, NA), lty = c(NA,NA,NA,1),  bty = 'n')
+}
+
 png('../Results/figures/allFibroblasts.png', width = 6000, height = 2000, res = 300, pointsize = 20)
 par(mfrow=c(1,3), mar=c(2.5,3,2,1), mgp=c(1.5,0.5,0))
 sharedGenes <- intersect(intersect(hvgDF$HVG, hvgLDF$HVG), hvgLPF$HVG)
-intersect(hvgLDF$HVG, hvgLPF$HVG)
-gCol <- ifelse(hvgDF$stat$p.adj < 0.01, yes = 'dodgerblue4', no = 'black')
-gPCH <- ifelse(rownames(hvgDF$stat) %in% sharedGenes, yes = 8, no = 16)
-plot(log(hvgDF$stat$mean),log(hvgDF$stat$cv2obs), col = gCol, pch = gPCH, main = 'DERMAL FIBROBLAST',
-     xlab=parse(text = 'log(Mean)'), ylab = parse(text = 'log(CV^2)'))
-gammaReg <- hvgDF$stat[order(hvgDF$stat$mean),]
-points(log(gammaReg$mean), log(gammaReg$cv2exp), type = 'l', col = 'orange')
-legend('topright', legend = c('No HVG', 'HVG FDR < 0.01', 'Shared HVG', 'Gamma\nRegression'), col = c('black', 'dodgerblue4', 'dodgerblue4', 'orange'),pch = c(16,16,8, NA), lty = c(NA,NA,NA,1),  bty = 'n')
-
-gCol <- ifelse(hvgLDF$stat$p.adj < 0.01, yes = 'dodgerblue4', no = 'black')
-gPCH <- ifelse(rownames(hvgLDF$stat) %in% sharedGenes, yes = 8, no = 16)
-plot(log(hvgLDF$stat$mean),log(hvgLDF$stat$cv2obs), col = gCol, pch = gPCH, main = 'LUNG DISTAL FIBROBLAST',
-     xlab=parse(text = 'log(Mean)'), ylab = parse(text = 'log(CV^2)'))
-gCol <- ifelse(hvgLPF$stat$p.adj < 0.01, yes = 'dodgerblue4', no = 'black')
-gammaReg <- hvgLDF$stat[order(hvgLDF$stat$mean),]
-points(log(gammaReg$mean), log(gammaReg$cv2exp), type = 'l', col = 'orange')
-legend('topright', legend = c('No HVG', 'HVG FDR < 0.01', 'Shared HVG', 'Gamma\nRegression'), col = c('black', 'dodgerblue4', 'dodgerblue4', 'orange'),pch = c(16,16,8, NA), lty = c(NA,NA,NA,1),  bty = 'n')
-
-gPCH <- ifelse(rownames(hvgLPF$stat) %in% sharedGenes, yes = 8, no = 16)
-plot(log(hvgLPF$stat$mean),log(hvgLPF$stat$cv2obs), col = gCol, pch = gPCH, main = 'LUNG PROXIMAL FIBROBLAST',
-     xlab=parse(text = 'log(Mean)'), ylab = parse(text = 'log(CV^2)'))
-gammaReg <- hvgLPF$stat[order(hvgLPF$stat$mean),]
-points(log(gammaReg$mean), log(gammaReg$cv2exp), type = 'l', col = 'orange')
-legend('topright', legend = c('No HVG', 'HVG FDR < 0.01', 'Shared HVG', 'Gamma\nRegression'), col = c('black', 'dodgerblue4', 'dodgerblue4', 'orange'),pch = c(16,16,8, NA), lty = c(NA,NA,NA,1),  bty = 'n')
+plotHVG(hvgDF, mainLabel = 'DERMAL FIBROBLAST')
+plotHVG(hvgLDF, mainLabel = 'LUNG DISTAL FIBROBLAST')
+plotHVG(hvgLPF, mainLabel = 'LUNG PROXIMAL FIBROBLAST')
 dev.off()
 
 source('https://raw.githubusercontent.com/dosorio/utilities/master/enrichments/hsa_GO_SYMBOL.R')
+source('https://raw.githubusercontent.com/dosorio/utilities/master/idConvert/hsa_ENTREZ2SYMBOL.R')
 GO <- hsa_GO_SYMBOL(sharedGenes)
 GO <- GO[order(GO$p.adjust),]
+symbolID <- hsa_ENTREZ2SYMBOL(unlist(strsplit(GO$geneID[1], '/')))[,2]
+writeLines(symbolID, sep = ', ')
 write.csv(GO, '../Results/annotations/allFIBROBLASTS.csv')
+
+
+GODF <- hsa_GO_SYMBOL(hvgDF$HVG)
+GOLDF <- hsa_GO_SYMBOL(hvgLDF$HVG)
+GOLPF <- hsa_GO_SYMBOL(hvgLPF$HVG)
