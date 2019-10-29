@@ -44,12 +44,13 @@ findHVG <- function(X, cutOff = 0.01){
   recip.means[is.infinite(recip.means)] <- 0
   fit <- glm(cv2~recip.means, family = Gamma(link = 'identity'))
   pFit <- predict(fit)
-  pVal <- pchisq((cv2/pFit)*999,999, lower.tail = FALSE)
+  pVal <- pchisq(cv2/pFit*999,999, lower.tail = FALSE)
+  FC <- log2(cv2/pFit)
   pAdj <- p.adjust(pVal, method = 'fdr')
-  hvgStat <- cbind(means, cv2, pFit, pVal, pAdj)
+  hvgStat <- cbind(means, cv2, pFit,FC, pVal, pAdj)
   hvgStat <- as.data.frame(hvgStat)
-  colnames(hvgStat) <- c('mean', 'cv2obs', 'cv2exp', 'p.value', 'p.adj')
-  HVG <- names(pAdj[pAdj < cutOff])
+  colnames(hvgStat) <- c('mean', 'cv2obs', 'cv2exp','log2FC', 'p.value', 'p.adj')
+  HVG <- names(pAdj[pAdj < cutOff & FC > log2(1.5)])
   out <- list()
   out$dr <- phateDR
   out$seedCell <- seedCell
@@ -81,14 +82,14 @@ LPF <- scQC(LPF)
 hvgLPF <- findHVG(LPF)
 
 plotHVG <- function(X, mainLabel){
-  gCol <- ifelse(X$stat$p.adj < 0.01, yes = 'dodgerblue4', no = 'black')
+  gCol <- ifelse(rownames(X$stat) %in% X$HVG, yes = 'dodgerblue4', no = 'black')
   gPCH <- ifelse(rownames(X$stat) %in% sharedGenes, yes = 8, no = 16)
   plot(log(X$stat$mean),log(X$stat$cv2obs), col = gCol, pch = gPCH, main = mainLabel,
-       xlab=parse(text = 'log(Mean)'), ylab = parse(text = 'log(CV^2)'))
+       xlab=parse(text = 'log(Mean)'), ylab = parse(text = 'log(CV^2)'), cex = 0.5)
   gammaReg <- X$stat[order(X$stat$mean),]
   points(log(gammaReg$mean), log(gammaReg$cv2exp), type = 'l', col = 'orange')
-  noHVG <- sum(X$stat$p.adj > 0.01)
-  HVG <- sum(X$stat$p.adj < 0.01)
+  HVG <- length(X$HVG)
+  noHVG <- nrow(X$stat)-HVG
   nShared <- length(sharedGenes)
   legend('topright', legend = c(paste0('No HVG (',noHVG,')'), paste0('HVG FDR < 0.01 (',HVG,')'), paste0('Shared HVG (',nShared,')'), 'Gamma\nRegression'), col = c('black', 'dodgerblue4', 'dodgerblue4', 'orange'),pch = c(16,16,8, NA), lty = c(NA,NA,NA,1),  bty = 'n')
 }
