@@ -10,47 +10,51 @@ cMatrix <- readMM('../Data/LAEC//matrix.mtx')
 rownames(cMatrix) <- readLines('../Data/LAEC/genes.tsv')
 colnames(cMatrix) <- readLines('../Data/LAEC/barcodes.tsv')
 
-# Quality Control
-mtRate <- colSums(cMatrix[grepl('MT-',rownames(cMatrix)),])/colSums(cMatrix)
-cMatrix <- cMatrix[,mtRate < 0.1]
-
-# Cell Cycle Assignation
-cMatrix <- CreateSeuratObject(cMatrix)
-cMatrix <- NormalizeData(cMatrix)
-cMatrix <- ScaleData(cMatrix)
-cMatrix <- CellCycleScoring(cMatrix, s.features = cc.genes$s.genes, g2m.features = cc.genes$g2m.genes)
-g1Cells <- cMatrix$Phase %in% 'G1'
-
-# Filtering G1 Cells
-cMatrix <- cMatrix@assays$RNA@counts
-cMatrix <- cMatrix[,g1Cells]
-
-# Normalization RC
-cMatrix <- t(t(cMatrix)/colSums(cMatrix)) * 1e6
-
-# Filtering genes with 0 counts
-cMatrix <- cMatrix[rowSums(cMatrix) > 0,]
-
-# Removing immune genes
+# Loading immune genes
 immuneGenes <- read.csv('../Annotations/GO_term_summary_20191022_094850.txt', sep = '\t', row.names = NULL, stringsAsFactors = FALSE)
 immuneGenes <- toupper(unique(immuneGenes$MGI.Gene.Marker.ID))
-cMatrix <- cMatrix[!rownames(cMatrix) %in% immuneGenes,]
+
+# Quality Control
+scQC <- function(X){
+  X <- X[,colSums(X) > 1000]
+  lSize <- colSums(X)
+  X <- X[,!lSize %in% boxplot.stats(lSize)$out]
+  mtRate <- colSums(X[grepl('MT-',rownames(X)),])/colSums(X)
+  X <- X[,mtRate < 0.1]
+  X <- CreateSeuratObject(X)
+  X <- NormalizeData(X)
+  X <- ScaleData(X)
+  X <- CellCycleScoring(X, s.features = cc.genes$s.genes, g2m.features = cc.genes$g2m.genes)
+  X <- X@assays$RNA@counts[,X$Phase == 'G1']
+  X <- (t(t(X)/colSums(X))*1e6)
+  X <- X[rowSums(X) > 0,]
+  X <- X[!rownames(X) %in% immuneGenes,]
+  X <- X[!grepl('MT-',rownames(X)),]
+  return(X)
+}
+cMatrix <- scQC(cMatrix)
 
 # Phate
 drPhate <- phate(t(cMatrix), ndim = 3)
 drPhate <- drPhate$embedding
 
-# KNN of 1000 more similar cells
-K <- as.matrix(dist(drPhate))
-K <- t(apply(K,1,function(X){as.numeric(rank(X, 'random') <= 1000)}))
-
 # Sampling 10 cells as center
 set.seed(1)
-nBoot <- 1000
+nBoot <- 10
 sCells <- sample(seq_len(ncol(cMatrix)),nBoot, replace = TRUE)
 
+# KNN of 1000 more similar cells
+K <- as.matrix(dist(drPhate))
+K <- K[sCells,]
+K <- t(apply(K,1,function(X){rank(X) <= 1000}))
+
+png('../Results/figures/rep10LAEC.png', width = 6000, height = 2000, pointsize = 15, res = 300)
+lMatrix <- matrix(data = c(1,2,3,4,5,11,11,6,7,8,9,10,11,11), nrow = 2, byrow = TRUE)
+layout(lMatrix)
+par(mar=c(3,3,1,1), mgp=c(1.5,0.5,0))
+
 # Identify the HVG in each case
-HVG <- pbapply::pbsapply(sCells, function(X){
+HVG <- pbapply::pbsapply(seq_len(nBoot), function(X){
   temp <- cMatrix[,which(as.logical(K[X,]))]
   temp <- temp[rowMeans(temp!=0) > 0.05,]
   means <- rowMeans(temp, na.rm = T)
@@ -62,10 +66,19 @@ HVG <- pbapply::pbsapply(sCells, function(X){
   
   fit <- glm(cv2~recip.means, family = Gamma(link = 'identity'))
   pFit <- predict(fit)
+  FC <- cv2/pFit
   pVal <- pchisq((cv2/pFit)*999,999, lower.tail = FALSE)
   pAdj <- p.adjust(pVal, method = 'fdr')
   #plot(xplot, col = ifelse(rownames(temp) %in% names(pAdj[pAdj < 0.01]),'red','black'))
-  names(pAdj[pAdj < 0.01])
+  listHVG <- names(pAdj[pAdj < 0.01 & FC > 1.5])
+  gCol <- ifelse(rownames(temp) %in% listHVG, 'dodgerblue4','black')
+  regLine <- cbind(log(means),log(pFit))
+  regLine <- regLine[order(regLine[,1]),]
+  plot(log(means),log(cv2), col = gCol, xlab=parse(text = 'log(Mean)'), ylab=parse(text = 'log(CV^2)'), pch = 16, cex = 0.5, main = paste0('REPLICATE: ', X))
+  points(regLine, col='orange', type = 'l')
+  nHVG <- length(listHVG)
+  legend('bottomleft', legend = c(paste0('HVG (',nHVG,')'), 'Gamma\nRegression'), bty = 'n', pch = c(16,NA), col=c('dodgerblue4','orange'), lty=c(NA,1))
+  return(listHVG)
 })
 
 # Computing Jaccard Coefficient
@@ -75,9 +88,8 @@ jaccardMatrix <- sapply(HVG, function(X){
   })
 })
 newCol <- RColorBrewer::brewer.pal(9,'Blues')
-png('../Results/figures/LAEC_Jaccard.png', width = 1500, height = 1500, res = 300)
 corrplot::corrplot(jaccardMatrix, col = newCol, is.corr = FALSE, type = 'upper', 
-                   method = 'color', mar = c(1,1,1,1), order='original',tl.col = "black")
+                   method = 'color', mar = c(1,1,1,1), order='original',tl.col = "black", title = toupper('Jaccard Similarity Index'))
 dev.off()
 
 # Finding union and intersection
@@ -97,38 +109,3 @@ GO2 <- GO2[order(GO2$p.adjust,decreasing = FALSE),]
 write.csv(GO, file = '../Results/annotations/LAEC_GO_UNION.csv')
 write.csv(GO2, file = '../Results/annotations/LAEC_GO_INTERSECTION.csv')
 
-
-# Plot
-temp <- cMatrix
-temp <- temp[rowMeans(temp!=0) > 0.05,]
-means <- rowMeans(temp, na.rm = T)
-vars <- apply(temp, 1, var, na.rm=T)
-cv2 <- vars/(means^2)
-recip.means <- 1/means
-recip.means[is.infinite(recip.means)] <- 0
-fit <- glm(cv2~recip.means, family = Gamma(link = 'identity'))
-pFit <- predict(fit)
-pMeans <- means[names(pFit)]
-xplot <- cbind(log10(means),log10(cv2))
-colnames(xplot) <- c('mean_log','cv2_log')
-xplot <- as.data.frame(xplot)
-
-# plot(xplot)
-# regLine <- cbind(log10(pMeans),log10(pFit))
-# regLine <- regLine[order(regLine[,1]),]
-# points(regLine, type='l', col= 'red')
-
-source('https://raw.githubusercontent.com/dosorio/utilities/master/idConvert/hsa_ENTREZ2SYMBOL.R')
-topGO <- unlist(strsplit(GO2$geneID[1], split = '/'))
-topGO <- hsa_ENTREZ2SYMBOL(topGO)[,2]
-
-png('../Results/figures/LAEC.png', width = 4000, height = 3000, res = 300)
-gCol <- ifelse(rownames(xplot) %in% HVG, rgb(1,0,0,1), rgb(0,0,0,1))
-ggplot(xplot, mapping = aes(x = mean_log, y = cv2_log)) +
-  geom_point(color=gCol) +
-  geom_text_repel(data = xplot[topGO,], label=topGO, max.iter = 10000, color='gray40')+
-  theme_classic() +
-  xlab(parse(text = 'log[10](Mean)')) +
-  ylab(parse(text = 'log[10](CV^2)')) +
-  ggtitle(label = 'LUNG AIRWAY EPITHELIUM', subtitle = toupper(GO2$Description[1]))
-dev.off()
