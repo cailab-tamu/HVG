@@ -12,7 +12,7 @@ geneList <- rownames(igeneMatrix)
 nfkbAssociations <- read.csv('../Data/nfkbAssociations.csv', row.names = 1)
 
 png('../Results/figures/FIG4C.png', width = 2000, height = 2000, res = 300, pointsize = 20)
-par(mfrow=c(8,8), mar=c(.5,.5,.5,.5))
+par(mfrow=c(8,8), mar=c(.1,.5,.5,0.1))
 for(i in 1:8){
   for(j in 1:8){
     if(i == j){
@@ -43,7 +43,7 @@ for(i in 1:8){
             box(col='red', lwd=3)  
           }
         } else {
-          plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray90')
+          plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray95')
           box(col='gray90', lwd=3)
         }
         mtext(text = geneList[j], line = -0.1, side = 3, cex = 0.4)
@@ -70,7 +70,7 @@ for(i in 1:8){
               box(col='red', lwd=3)  
             }
           } else {
-            plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray90')
+            plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray95')
             box(col='gray90', lwd=3)
           }
           mtext(text = geneList[i], line = -0.1, side = 2, cex = 0.4)
@@ -95,7 +95,7 @@ for(i in 1:8){
               box(col='red', lwd=3)  
             }
           } else {
-            plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray90')
+            plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray95')
             box(col='gray90', lwd=3)
           }
         }
