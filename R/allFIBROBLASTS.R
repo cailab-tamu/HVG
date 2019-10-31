@@ -87,11 +87,14 @@ plotHVG <- function(X, mainLabel){
   plot(log(X$stat$mean),log(X$stat$cv2obs), col = gCol, pch = gPCH, main = mainLabel,
        xlab=parse(text = 'log(Mean)'), ylab = parse(text = 'log(CV^2)'), cex = 0.5)
   gammaReg <- X$stat[order(X$stat$mean),]
+  points(log(gammaReg$mean), log(1.5*gammaReg$cv2exp), type = 'l', col = 'orange', lty=2)
   points(log(gammaReg$mean), log(gammaReg$cv2exp), type = 'l', col = 'orange')
+  points(log(gammaReg$mean), log(0.66*gammaReg$cv2exp), type = 'l', col = 'orange', lty=2)
+  
   HVG <- length(X$HVG)
   noHVG <- nrow(X$stat)-HVG
   nShared <- length(sharedGenes)
-  legend('topright', legend = c(paste0('No HVG (',noHVG,')'), paste0('HVG FDR < 0.01 (',HVG,')'), paste0('Shared HVG (',nShared,')'), 'Gamma\nRegression'), col = c('black', 'dodgerblue4', 'dodgerblue4', 'orange'),pch = c(16,16,8, NA), lty = c(NA,NA,NA,1),  bty = 'n')
+  legend('topright', legend = c(paste0('No HVG (',noHVG,')'), paste0('HVG (',HVG,')'), paste0('Shared HVG (',nShared,')'), 'Gamma\nRegression'), col = c('black', 'dodgerblue4', 'dodgerblue4', 'orange'),pch = c(16,16,8, NA), lty = c(NA,NA,NA,1),  bty = 'n')
 }
 
 png('../Results/figures/allFibroblasts.png', width = 6000, height = 2000, res = 300, pointsize = 20)
