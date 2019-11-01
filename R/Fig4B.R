@@ -14,10 +14,11 @@ sMatrix <- sMatrix[order(sMatrix[,3]),]
 sMatrix <- as.data.frame(sMatrix)
 
 #Figure
-png('../Results/figures/Fig4B.png', width = 2000, height = 2000, res = 300, pointsize = 20)
+png('../Results/figures/Fig4B.png', width = 2500, height = 2000, res = 300, pointsize = 20)
 layout(matrix(c(1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2), nrow = 3, byrow = TRUE))
 par(mar=c(3,3,1,0), mgp=c(1.5,0.5,0))
-plot(sMatrix$IRF4,sMatrix$AICDA, pch=16, cex=0.6, col=newCol(nrow(sMatrix)), xlab = 'IRF4',ylab='AICDA', main = 'PRDM1')
+plot(sMatrix$IRF4,sMatrix$AICDA, pch=16, cex=0.6, col=newCol(nrow(sMatrix)), xlab = '',ylab='', main = 'PRDM1 (Blimp1)')
+box(lwd=3)
 par(mar=c(6,2.5,3,0.5), mgp=c(1.5,0.5,0))
 image(t(as.matrix(sMatrix$PRDM1)), col=newCol(nrow(sMatrix)), xaxt='n', yaxt='n')
 newLabels <- round(seq(min(sMatrix$PRDM1), max(sMatrix$PRDM1),(max(sMatrix$PRDM1)-min(sMatrix$PRDM1))/5),1)
