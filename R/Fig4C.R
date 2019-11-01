@@ -1,8 +1,6 @@
 library(Matrix)
 library(phateR)
 library(Seurat)
-library(plot3D)
-library(rgl)
 
 # Reading imputed values
 igeneMatrix <- t(read.csv('../Data/nfkb8genes.csv'))
@@ -43,7 +41,7 @@ for(i in 1:8){
             box(col='red', lwd=3)  
           }
         } else {
-          plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray95')
+          plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray85')
           box(col='gray90', lwd=3)
         }
         mtext(text = geneList[j], line = -0.1, side = 3, cex = 0.4)
@@ -70,7 +68,7 @@ for(i in 1:8){
               box(col='red', lwd=3)  
             }
           } else {
-            plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray95')
+            plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray85')
             box(col='gray90', lwd=3)
           }
           mtext(text = geneList[i], line = -0.1, side = 2, cex = 0.4)
@@ -95,7 +93,7 @@ for(i in 1:8){
               box(col='red', lwd=3)  
             }
           } else {
-            plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray95')
+            plot(igeneMatrix[i,], igeneMatrix[j,], cex = 0.1, pch = 16, xaxt='n', yaxt='n', col = 'gray85')
             box(col='gray90', lwd=3)
           }
         }
