@@ -100,6 +100,7 @@ plotHVG <- function(X, mainLabel){
 png('../Results/figures/allFibroblasts.png', width = 6000, height = 2000, res = 300, pointsize = 20)
 par(mfrow=c(1,3), mar=c(2.5,3,2,1), mgp=c(1.5,0.5,0))
 sharedGenes <- intersect(intersect(hvgDF$HVG, hvgLDF$HVG), hvgLPF$HVG)
+writeLines(sharedGenes, '../Results/hvgList/allFIBROBLASTS.txt')
 plotHVG(hvgDF, mainLabel = 'DERMAL FIBROBLAST')
 plotHVG(hvgLDF, mainLabel = 'LUNG DISTAL FIBROBLAST')
 plotHVG(hvgLPF, mainLabel = 'LUNG PROXIMAL FIBROBLAST')
