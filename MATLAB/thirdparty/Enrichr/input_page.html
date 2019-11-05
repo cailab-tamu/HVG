@@ -1,0 +1,478 @@
+<form id="enrich" action="http://amp.pharm.mssm.edu/Enrichr/enrich" method="post" enctype="multipart/form-data">
+<h2>Input data</h2>
+<table id="data-input" border=0>
+<tr id="genes">
+<td id="file-input-td" width=40%>
+<div id="instructions">
+<p>Choose an input file to upload. Either in BED format or a
+list of genes. For a quantitative set, add a comma and the
+level of membership of that gene. The membership level is a
+number between 0.0 and 1.0 to represent a weight for each gene,
+where the weight of 0.0 will completely discard the gene from
+the enrichment analysis and the weight of 1.0 is the maximum.</p>
+<p>
+Try an example <a href="#" id="insertBedExample-link"
+onclick="return insertBedExample();">BED file</a>.
+</p>
+</div>
+<input type="hidden" name="useExample" id="useExample"
+value="false"> <input type="file" name="file"
+id="file-chooser" onchange="testForBed();"/>
+<div id="bed-parameters" style="display: none;">
+<table id="bed-parameters-table">
+<tr>
+<td>
+<p>Select parameters for bed file to gene list
+conversion.</p>
+</td>
+</tr>
+<tr>
+<td><label for="species-chooser">Species:</label> <select
+name="species" id="species-chooser">
+<option value="human_hg18">Human hg18</option>
+<option value="human_hg19">Human hg19</option>
+<option value="human_hg38">Human hg38</option>
+<option value="mouse_mm9">Mouse mm9</option>
+<option value="mouse_mm10">Mouse mm10</option>
+</select></td>
+</tr>
+<tr>
+<td><label for="bed-max-genes">Max number of
+genes:</label> <select name="maxGenes" id="bed-max-genes">
+<option value="2000">2000</option>
+<option value="1000" selected="selected">1000</option>
+<option value="500">500</option>
+</select></td>
+</tr>
+</table>
+</div>
+</td>
+<td id="textbox">
+<p>
+Or paste in a list of gene symbols optionally followed by a
+comma and levels of membership. Try two examples: <a href="#"
+id='insertCrispExample-link'
+onclick="return insertExample();">crisp
+set example</a>, <a href="#" id='insertFuzzyExample-link'
+onclick="return insertFuzzyExample();">fuzzy set example</a>
+</p> 
+<textarea name=list rows=10 id=text-area cols=63>LCE1F
+KCNMA1
+PI16
+ACAN
+IGFBP5
+COMP
+KRTAP2-3
+SFRP2
+LCE3D
+KRT19
+KRT81
+FLG
+KRT14
+G0S2
+CXCL1
+CPB1
+MMP3
+RGCC
+CLU
+KRT17
+STMN2
+PTX3
+MGP
+TFPI2
+MMP1
+CTSC
+PCP4
+MT1X
+ACTC1
+GAL
+ACTA2
+HIST1H4C
+LUM
+PPP1R14A
+RARRES2
+PENK
+DCN
+DKK1
+SERPINE2
+SCG5
+CEMIP
+OLFM2
+GRB14
+SFRP4
+KRTAP1-5
+IGFBP7
+IL1RL1
+PTTG1
+NMB
+KRT34
+TNFRSF11B
+POSTN
+PGF
+KRT16
+AKR1C1
+STC1
+PSG5
+MT1E
+ATF5
+LHX9
+ANKRD1
+SMYD3
+KRT7
+CRIP1
+ADH1B
+ADIRF
+FST
+CDKN3
+STMN1
+HSPB7
+SPON2
+NEFM
+DPP4
+UCHL1
+IGF1
+CRLF1
+S100A2
+SERPINB2
+BAMBI
+CYP1B1
+ADAMTS1
+IGFBP2
+TGM2
+NQO1
+HIST1H1C
+TNNT1
+LSP1
+TUBA1B
+CYTL1
+PRR15
+CSRP2
+HOXA4
+OSR2
+CCL26
+WNT2
+PSG4
+MT2A
+CFD
+AJAP1
+CLIC3
+COL15A1
+MFGE8
+NDUFA4L2
+UBE2C
+JAG1
+DPT
+LY6K
+CSTA
+TAGLN
+ARRDC2
+APOE
+HAPLN1
+PTGDS
+MEST
+IFI27
+SULF1
+THBD
+FBXO32
+CDKN1A
+EFEMP1
+ADGRG1
+IL12A
+CRABP2
+PSMC3IP
+CLDN11
+ZNF124
+ITPRIP
+CXCL3
+GLRX
+CEBPD
+SOCS2
+BIRC5
+NTF3
+EDN1
+PRSS3
+FGF7
+CDC20
+FABP5
+SOX4
+RNLS
+PSG2
+PTPRN2
+CD9
+F2R
+QPRT
+HSPB6
+PARD3
+RSPO3
+HMOX1
+SOD3
+ELN
+CXCL6
+OLFML2B
+MELK
+SFRP1
+DIO2
+CH25H
+CLSPN
+THBS1
+SCUBE3
+CXCL8
+ABCB9
+CENPF
+OXTR
+SERPINE1
+TSTD1
+CDA
+TINAGL1
+PTN
+SLC35E3
+ITGA2
+FABP3
+GADD45B
+PRAC2
+SNCG
+IL32
+IGFBP3
+PEG10
+AKAP12
+TLCD2
+FOXL1
+UBE2S
+HAPLN3
+GLIPR1
+ADRA2A
+COL8A1
+H2AFZ
+APOC1
+AP5B1
+FBN2
+CYP26B1
+MOK
+ANKRD50
+TM4SF1
+ACP5
+PCOLCE
+FGD6
+TSPAN13
+SUGCT
+F3
+SMC6
+DKK2
+MARCKSL1
+DUSP2
+LNPEP
+HSPA5
+HAS2
+HES1
+LMCD1
+SPEN
+TACSTD2
+DIRAS3
+NREP
+PRSS23
+CKB
+DDX10
+MEDAG
+ASH2L
+BMF
+CCL2
+BCL2L12
+CXCL14
+ISG20
+CLEC2B
+STC2
+CD70
+CENPM
+LYPD3
+MLLT11
+ZNF232
+APBB1IP
+ID4
+TRIB3
+C11orf96
+PTGER1
+INHBA
+FAM43A
+TNNC1
+PALM
+RASSF2
+S1PR3
+NFATC2
+TACC3
+MFAP4
+SERPINF1
+FMN1
+TROAP
+TPX2
+KLHL24
+MDFI
+CADM1
+CCDC152
+FOLR3
+DNAJC18
+PRC1
+SYNPO2
+CCDC8
+IER3
+C15orf48
+NPHP4
+PHACTR3
+HMGCS1
+NSG1
+BAALC
+PLXNA2
+SRGN
+CARD9
+DDIT4
+ACKR4
+PAPPA
+GTSE1
+CHRNE
+KRT8
+CHN1
+VTA1
+TMEM233
+PDE1A
+TUBB4B
+YLPM1
+ANGPT1
+TUBA1A
+IL7R
+SYNGR2
+LBH
+MSX1
+KCTD5
+SCARA3
+NGFR
+RIPK4
+IL33
+TK1
+CYGB
+CYYR1
+SBSN
+MAFB
+PTGER3
+CXCL2
+WNT16
+PAN3
+TRIP13
+TNFAIP6
+C11orf87
+TOP2A
+SLC20A1
+WNT5B
+CD163L1
+TNFRSF19
+DCUN1D1
+CCNB1
+TSPAN2
+NAT10
+CST6
+MKI67
+SMIM3
+SLC7A11
+FECH
+BDKRB1
+CNN1
+PTHLH
+MARCH4
+LYPD6B
+LMOD1
+SYT1
+GXYLT1
+NRG1
+LURAP1
+SLC4A7
+IL6
+GALE
+PHF7
+ANG
+ALDH1A3
+LAPTM5
+FAH
+FGF9
+WDYHV1
+COL3A1
+WFDC1
+NPW
+ADM
+PIP5KL1
+RASGRP2
+HEXIM2
+FLNC
+RCAN1
+TBC1D1
+TNXB
+PINLYP
+PPFIA4
+LHB
+PRELP
+CEP55
+APOD
+TMEM200A
+ASPM
+ERRFI1
+ADRA1D
+HLA-DPB1
+MRM1
+FAM131C
+PLAU
+NUDCD1
+CNEP1R1
+ECM2
+</textarea>
+<div id="gene-count">
+<!-- <span id="gene-found">0</span> of <span id="gene-count">0</span> genes found in the Enrichr database -->
+<span id="gene-count">0</span> gene(s) entered
+</div>
+</td>
+</tr>
+<tr id="description">
+<td colspan="2">
+<div>
+<p>Enter a brief description for the list in case you want
+to share it. (Optional)</p>
+<input type="text" name="description" maxlength="200"/>
+</div>
+<div class="next-step">
+<input type="hidden" name="validate" value="true"/>
+<button id="proceed-button">Submit</button>
+</div>
+</td>
+</tr>
+<tr id="contrib-button">
+<td>
+<p>
+<input type="checkbox" id="contCheck"> Contribute
+</p>
+</td>
+</tr>
+</table>
+<div class="clear"></div>
+<div id="citation">
+Please acknowledge Enrichr in your publications by citing the
+following references: <br/> <a
+href="http://www.ncbi.nlm.nih.gov/pubmed/23586463"
+id='pubmedCitation-link' target="_blank">Chen EY, Tan CM, Kou
+Y, Duan Q, Wang Z, Meirelles GV, Clark NR, Ma&#39;ayan A. Enrichr:
+interactive and collaborative HTML5 gene list enrichment analysis
+tool. <i>BMC Bioinformatics. 2013;128(14)</i>.
+</a> <br/>
+<br/> <a href="https://www.ncbi.nlm.nih.gov/pubmed/27141961"
+id='pubmedCitation-link' target="_blank"> Kuleshov MV, Jones
+MR, Rouillard AD, Fernandez NF, Duan Q, Wang Z, Koplev S, Jenkins
+SL, Jagodnik KM, Lachmann A, McDermott MG, Monteiro CD, Gundersen
+GW, Ma&#39;ayan A. Enrichr: a comprehensive gene set enrichment
+analysis web server 2016 update. <i>Nucleic Acids Research.
+2016; <a href=http://doi.org/10.1093/nar/gkw377>gkw377</a>
+</i>.
+</a>
+
+</div>
+<!-- 				<div class="next-step">
+<input type="hidden" name="validate" value="true" /> <input
+type="image" src="images/navigate-up-icon.png" width="64"
+height="64" title="Upload File" />
+</div> -->
+<div class="clear"></div>
+</form>

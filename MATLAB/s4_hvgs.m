@@ -22,9 +22,9 @@ end
 
 % Regression Plot
 % figure;
-% [Xnorm]=sc_norm(X,'type','deseq');
-% T=sc_hvg(Xnorm,genelist,true,true,false,true);
-% return;
+[Xnorm]=sc_norm(X,'type','deseq');
+T=sc_hvg(Xnorm,genelist,true,false,false,true);
+return;
 % figure;
 % loglog(T.u, T.residualcv2,'o')
 % xlabel('Mean expression, log')
@@ -68,9 +68,9 @@ end
 
 % Regression Plot
 % figure;
-% [Xnorm]=sc_norm(X,'type','deseq');
-% T=sc_hvg(Xnorm,genelist,true,true,false,true);
-% return;
+[Xnorm]=sc_norm(X,'type','deseq');
+T=sc_hvg(Xnorm,genelist,true,true,false,true);
+return;
 % figure;
 % loglog(T.u, T.residualcv2,'o')
 % xlabel('Mean expression, log')
@@ -114,9 +114,9 @@ end
 
 % Regression Plot
 % figure;
-% [Xnorm]=sc_norm(X,'type','deseq');
-% T=sc_hvg(Xnorm,genelist,true,true,false,true);
-% return;
+[Xnorm]=sc_norm(X,'type','deseq');
+T=sc_hvg(Xnorm,genelist,true,true,false,true);
+return;
 % figure;
 % loglog(T.u, T.residualcv2,'o')
 % xlabel('Mean expression, log')
