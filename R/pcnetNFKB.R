@@ -33,5 +33,6 @@ oAssociation[is.na(eAssociations)] <- NA
 oAssociation <- as.matrix(oAssociation)
 
 library(corrplot)
+png('../Results/figures/aFig4C.png', width = 2800, height = 2800, res = 300, pointsize = 16)
 corrplot.mixed(oAssociation, lower.col = 'black', na.label = ' ', mar = c(1,1,1,1))
-  
+dev.off()  
