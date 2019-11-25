@@ -16,9 +16,11 @@ scQC <- function(X){
   X <- X[,!lSize %in% boxplot.stats(lSize)$out]
   mtRate <- colSums(X[grepl('MT-',rownames(X)),])/colSums(X)
   X <- X[,mtRate < 0.1]
+  X <- X[-grep('MT-',rownames(X)),]
   X <- CreateSeuratObject(X)
   X <- NormalizeData(X)
   X <- ScaleData(X)
+  set.seed(1)
   X <- CellCycleScoring(X, s.features = cc.genes$s.genes, g2m.features = cc.genes$g2m.genes)
   X <- X@assays$RNA@counts[,X$Phase == 'G1']
   X <- (t(t(X)/colSums(X))*1e6)
@@ -83,6 +85,10 @@ plotHVG <- function(X, mainLabel){
 EMTAB6268 <- scQC(EMTAB6268)
 hvgEMTAB6268 <- findHVG(EMTAB6268)
 
+png('../Results/figures/EMTAB6268.png', width = 2100, height = 2100, res = 300, pointsize = 16)
+par(mar=c(3,3,1,1), mgp = c(1.5,0.5,0))
 plotHVG(hvgEMTAB6268, 'E-MTAB-6268')
+dev.off()
+
 writeLines(hvgEMTAB6268$HVG, sep=', ')
-# ID3, LEFTY1, RPP14, HIST1H4C, HSP90AB1, MALAT1, TAGLN, KPNA2, UBE2C, PARD6B, ZNF91, MT-ND1, MT-ND2, MT-CO1, MT-CO2, MT-ATP6, MT-CO3, MT-ND4, MT-CYB
+# ID3, LEFTY1, MALAT1, TAGLN
