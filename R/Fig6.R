@@ -44,7 +44,7 @@ findHVG <- function(X, cutOff = 0.01){
   recip.means[is.infinite(recip.means)] <- 0
   fit <- glm(cv2~recip.means, family = Gamma(link = 'identity'))
   pFit <- predict(fit)
-  pVal <- pchisq(cv2/pFit*999,999, lower.tail = FALSE)
+  pVal <- pchisq((cv2/pFit)*999,999, lower.tail = FALSE)
   FC <- log2(cv2/pFit)
   pAdj <- p.adjust(pVal, method = 'fdr')
   hvgStat <- cbind(means, cv2, pFit,FC, pVal, pAdj)
@@ -63,7 +63,7 @@ findHVG <- function(X, cutOff = 0.01){
 # Plot
 plotHVG <- function(X, mainLabel, ...){
   gCol <- ifelse(rownames(X$stat) %in% X$HVG, yes = 'dodgerblue4', no = 'black')
-  gPCH <- 16 #ifelse(rownames(X$stat) %in% sharedGenes, yes = 8, no = 16)
+  gPCH <- 20 #ifelse(rownames(X$stat) %in% sharedGenes, yes = 8, no = 16)
   plot(log(X$stat$mean),log(X$stat$cv2obs), col = gCol, pch = gPCH, main = mainLabel,
        xlab=parse(text = 'log(Mean)'), ylab = parse(text = 'log(CV^2)'), cex = 0.5,...)
   gammaReg <- X$stat[order(X$stat$mean),]
@@ -83,6 +83,13 @@ rownames(iPSC) <- readLines('../Data/s4_hiPSC/genes.tsv')
 iPSC <- scQC(iPSC)
 iPSC <- findHVG(iPSC)
 
+# B-Cells
+B <- readMM('../Data/GM12878/matrix.mtx')
+rownames(B) <- read.table('../Data/GM12878/genes.tsv', stringsAsFactors = FALSE)[,2]
+colnames(B) <- readLines('../Data/GM12878/barcodes.tsv')
+B <- scQC(B)
+B <- findHVG(B)
+
 # LAEC
 LAEC <- readMM('../Data/LAEC/matrix.mtx')
 rownames(LAEC) <- readLines('../Data/LAEC/genes.tsv')
@@ -98,9 +105,10 @@ DF <- scQC(DF)
 DF <- findHVG(DF)
 
 # Figure 6
-png('../Results/figures/Fig6.png', width = 6000, height = 2000, res = 300, pointsize = 20)
-par(mfrow=c(1,3), mar=c(3,3,2,1), mgp=c(1.5,0.5,0))
+png('../Results/figures/Fig6.png', width = 6000, height = 1500, res = 300, pointsize = 20)
+par(mfrow=c(1,4), mar=c(3,3,2.5,1), mgp=c(1.5,0.5,0))
 plotHVG(iPSC, 'iPSC')
-plotHVG(LAEC, 'LAEC')
-plotHVG(DF, 'DF')
+plotHVG(B, 'B CELLS')
+plotHVG(LAEC, 'LUNG AIRWAY EPITHELIUM')
+plotHVG(DF, 'DERMAL FIBROBLASTS')
 dev.off()
